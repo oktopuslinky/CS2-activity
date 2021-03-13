@@ -1,9 +1,8 @@
 import pandas as pd
 import csv
+import matplotlib.pyplot as plt
+from prettytable import PrettyTable
 
-#https://cmdlinetips.com/2020/03/save-a-pandas-data-frame-as-csv-file/
-
-excel_sheet = "Best_50_movies_of_all_time.xlsx"
 
 def create_df_from_xlsx(excel_sheet):
     data_xlsx = pd.read_excel(excel_sheet, 'Sheet1', index_col=None)
@@ -31,10 +30,15 @@ def convert_csv_list():
         the_data[index] = item
 
     the_data[0][1] = "Citizen Kane"
-    
-    print(the_data)
+
     return the_data
-    
+
+def create_table(the_data):
+    movies = PrettyTable()
+    movies.field_names = ["Ranking", "Name", "Year", "Director", "Country"]
+    movies.add_rows(the_data)
+    print(movies)
+
 def create_updated_df(the_data):
     the_rankings = list()
     the_names = list()
@@ -50,8 +54,6 @@ def create_updated_df(the_data):
         the_directors.append(director)
         the_countries.append(country)
         
-    print(the_rankings)
-
     #create updated DataFrame
 
     df = pd.DataFrame(
@@ -64,16 +66,35 @@ def create_updated_df(the_data):
         }
     )
 
-    print(df)
     return df, the_rankings, the_names, the_years, the_directors, the_countries
 
 def create_tsv(df):
     df.to_csv("movie_data.tsv", sep="\t")
 
+def convert_list_data_int(the_list):
+    int_list = list()
+    for an_item in the_list:
+        int_list.append(int(an_item))
 
+    return int_list
+
+def graph(the_years, the_rankings):
+    years_int = convert_list_data_int(the_years)
+    rankings_int = convert_list_data_int(the_rankings)
+
+    plt.scatter(years_int, rankings_int)
+    plt.xlabel("The Year of Release")
+    plt.ylabel("Ranking")
+    plt.title("Best 50 Movies of All Time")
+    plt.show()
+
+excel_sheet = "Best_50_movies_of_all_time.xlsx"
 
 df = create_df_from_xlsx(excel_sheet)
 convert_df_csv(df)
 the_data = convert_csv_list()
+create_table(the_data)
 df, the_rankings, the_names, the_years, the_directors, the_countries = create_updated_df(the_data)
 create_tsv(df)
+
+graph(the_years, the_rankings)
